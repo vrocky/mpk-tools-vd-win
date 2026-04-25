@@ -1,3 +1,0 @@
- which virual desktop running based on that run calude code , so lets have directories claude-ws\vd-profiles\vd-<x>  so the current direcoty  
-  for claude then will be claude-ws\vd-profiles\vd-<x>  , so that when i run claudew it will open on that directory so that its super          
-  comfortable to run claudew --resume this will resume the calude from there only directory only refer how we did C:\Scripts\VSCodeProfiles 

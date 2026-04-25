@@ -1,0 +1,42 @@
+[submodule "mpk-tools-antigravity-profile-picker"]
+	path = mpk-tools-antigravity-profile-picker
+	url = https://github.com/vrocky/mpk-tools-antigravity-profile-picker.git
+[submodule "mpk-tools-antigravity-profile-project-search"]
+	path = mpk-tools-antigravity-profile-project-search
+	url = https://github.com/vrocky/mpk-tools-antigravity-profile-project-search.git
+[submodule "mpk-tools-mpk-profile-common-libs"]
+	path = mpk-tools-mpk-profile-common-libs
+	url = https://github.com/vrocky/mpk-tools-mpk-profile-common-libs.git
+[submodule "mpk-tools-sticky-notes-profile-picker"]
+	path = mpk-tools-sticky-notes-profile-picker
+	url = https://github.com/vrocky/mpk-tools-sticky-notes-profile-picker.git
+[submodule "mpk-tools-sticky-notes-profile-text-search"]
+	path = mpk-tools-sticky-notes-profile-text-search
+	url = https://github.com/vrocky/mpk-tools-sticky-notes-profile-text-search.git
+[submodule "mpk-tools-vscode-profile-picker"]
+	path = mpk-tools-vscode-profile-picker
+	url = https://github.com/vrocky/mpk-tools-vscode-profile-picker.git
+[submodule "mpk-tools-vscode-profile-project-search"]
+	path = mpk-tools-vscode-profile-project-search
+	url = https://github.com/vrocky/mpk-tools-vscode-profile-project-search.git
+[submodule "mpk-tools-win-virtual-desktop-antigravity-launch"]
+	path = mpk-tools-win-virtual-desktop-antigravity-launch
+	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-antigravity-launch.git
+[submodule "mpk-tools-win-virtual-desktop-chrome-launch"]
+	path = mpk-tools-win-virtual-desktop-chrome-launch
+	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-chrome-launch.git
+[submodule "mpk-tools-win-virtual-desktop-claude-launch"]
+	path = mpk-tools-win-virtual-desktop-claude-launch
+	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-claude-launch.git
+[submodule "mpk-tools-win-virtual-desktop-edge-launch"]
+	path = mpk-tools-win-virtual-desktop-edge-launch
+	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-edge-launch.git
+[submodule "mpk-tools-win-virtual-desktop-poc"]
+	path = mpk-tools-win-virtual-desktop-poc
+	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-poc.git
+[submodule "mpk-tools-win-virtual-desktop-sticky-notes-launch"]
+	path = mpk-tools-win-virtual-desktop-sticky-notes-launch
+	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-sticky-notes-launch.git
+[submodule "mpk-tools-win-virtual-desktop-vscode-launch"]
+	path = mpk-tools-win-virtual-desktop-vscode-launch
+	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-vscode-launch.git
