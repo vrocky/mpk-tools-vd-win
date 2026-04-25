@@ -1,0 +1,125 @@
+﻿<Window x:Class="StickyNotesProfilePicker.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Settings — StickyNotes Profile Picker"
+        Icon="../app.ico"
+        Width="560" Height="280"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#1e1e1e">
+
+    <Window.Resources>
+        <Style x:Key="DarkButton" TargetType="Button">
+            <Setter Property="Background" Value="#2d2d2d"/>
+            <Setter Property="Foreground" Value="#cccccc"/>
+            <Setter Property="BorderBrush" Value="#3e3e3e"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#3e3e3e"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource DarkButton}">
+            <Setter Property="Background" Value="#007acc"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#007acc"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1a8fd1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="StickyNotes Settings"
+                   FontSize="20" FontWeight="SemiBold"
+                   Foreground="#cccccc"/>
+
+        <TextBlock Grid.Row="2" Text="Data Directory"
+                   FontSize="13" FontWeight="Medium"
+                   Foreground="#cccccc" Margin="0,0,0,6"/>
+        
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <Border Grid.Column="0" Background="#252526" CornerRadius="5"
+                    BorderBrush="#3e3e3e" BorderThickness="1" Margin="0,0,8,0">
+                <TextBox x:Name="DataDirectoryBox"
+                         Background="Transparent" Foreground="#cccccc"
+                         BorderThickness="0" Padding="10,7"
+                         FontSize="12" CaretBrush="#007acc"/>
+            </Border>
+            
+            <Button Grid.Column="1" Content="Browse..."
+                    Style="{StaticResource DarkButton}"
+                    Click="BrowseDataDir_Click"/>
+        </Grid>
+
+        <TextBlock Grid.Row="5" Text="StickyNotesApp Executable"
+                   FontSize="13" FontWeight="Medium"
+                   Foreground="#cccccc" Margin="0,0,0,6"/>
+        
+        <Grid Grid.Row="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <Border Grid.Column="0" Background="#252526" CornerRadius="5"
+                    BorderBrush="#3e3e3e" BorderThickness="1" Margin="0,0,8,0">
+                <TextBox x:Name="ExePathBox"
+                         Background="Transparent" Foreground="#cccccc"
+                         BorderThickness="0" Padding="10,7"
+                         FontSize="12" CaretBrush="#007acc"/>
+            </Border>
+            
+            <Button Grid.Column="1" Content="Browse..."
+                    Style="{StaticResource DarkButton}"
+                    Click="BrowseExe_Click"/>
+        </Grid>
+
+        <StackPanel Grid.Row="8" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Cancel" Width="90"
+                    Style="{StaticResource DarkButton}"
+                    Margin="0,0,8,0"
+                    Click="Cancel_Click"/>
+            <Button Content="Save" Width="90"
+                    Style="{StaticResource AccentButton}"
+                    Click="Save_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

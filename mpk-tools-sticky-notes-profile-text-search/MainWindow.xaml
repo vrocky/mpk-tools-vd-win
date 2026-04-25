@@ -1,0 +1,266 @@
+<Window x:Class="StickyNotesProfileTextSearch.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="StickyNotes Text Search Across Profiles"
+        Icon="/app.ico"
+        Width="1020" Height="720"
+        MinWidth="800" MinHeight="500"
+        WindowStartupLocation="CenterScreen"
+        Background="#1A1A1A">
+
+    <Window.Resources>
+        <Style x:Key="SearchBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="#2D2D2D"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="CaretBrush" Value="#FFF740"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#444444"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <Grid>
+                                <TextBlock x:Name="Placeholder"
+                                           Text="Search by note title or content..."
+                                           Foreground="#888888"
+                                           Padding="{TemplateBinding Padding}"
+                                           VerticalAlignment="Center"
+                                           IsHitTestVisible="False"
+                                           Visibility="Collapsed"/>
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Padding="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="#FFF740"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#FFF740"/>
+            <Setter Property="Foreground" Value="#1A1A1A"/>
+            <Setter Property="BorderBrush" Value="#FFF740"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFE020"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#444444"/>
+                                <Setter Property="Foreground" Value="#888888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#2D2D2D"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderBrush" Value="#444444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#3D3D3D"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="NoteCard" TargetType="Border">
+            <Setter Property="Background" Value="#2D2D2D"/>
+            <Setter Property="BorderBrush" Value="#444444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="StickyNotes Text Search" 
+                           FontSize="26" 
+                           FontWeight="Bold" 
+                           Foreground="#FFF740"/>
+                <TextBlock x:Name="SubtitleText" 
+                           Text="Search all your notes across profiles" 
+                           FontSize="13" 
+                           Foreground="#AAAAAA" 
+                           Margin="0,4,0,0"/>
+            </StackPanel>
+
+            <Button Grid.Column="1" 
+                    Content="⚙ Settings" 
+                    Style="{StaticResource SecondaryButton}"
+                    Click="Settings_Click"
+                    FontSize="13"/>
+        </Grid>
+
+        <!-- Search Box -->
+        <TextBox x:Name="SearchBox" 
+                 Grid.Row="1" 
+                 Style="{StaticResource SearchBoxStyle}"
+                 TextChanged="SearchBox_TextChanged"
+                 Margin="0,0,0,10"/>
+
+        <!-- Toolbar -->
+        <Grid Grid.Row="2" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <CheckBox x:Name="IncludeMissingCheck" 
+                      Grid.Column="0"
+                      Content="Include missing profiles" 
+                      Foreground="#AAAAAA"
+                      VerticalAlignment="Center"
+                      Margin="0,0,15,0"
+                      Checked="IncludeMissing_Changed"
+                      Unchecked="IncludeMissing_Changed"/>
+
+            <Button Grid.Column="2" 
+                    Content="🔄 Refresh" 
+                    Style="{StaticResource SecondaryButton}"
+                    Click="Refresh_Click"
+                    FontSize="13"/>
+        </Grid>
+
+        <!-- Notes List -->
+        <ScrollViewer Grid.Row="3" 
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl x:Name="NotesList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource NoteCard}"
+                                MouseLeftButtonDown="NoteCard_Click"
+                                Tag="{Binding}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Color Bar -->
+                                <Rectangle Grid.Column="0" 
+                                           Fill="{Binding Color}"
+                                           RadiusX="3"
+                                           RadiusY="3"
+                                           Margin="0,0,12,0"/>
+
+                                <!-- Note Content -->
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{Binding DisplayTitle}" 
+                                               FontSize="15" 
+                                               FontWeight="SemiBold" 
+                                               Foreground="#E0E0E0"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    
+                                    <TextBlock Text="{Binding ContentPreview}" 
+                                               FontSize="13" 
+                                               Foreground="#AAAAAA" 
+                                               Margin="0,6,0,8"
+                                               TextWrapping="Wrap"
+                                               MaxHeight="60"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding ProfileName}" 
+                                                   FontSize="12" 
+                                                   Foreground="#888888"/>
+                                        <TextBlock Text=" • " 
+                                                   FontSize="12" 
+                                                   Foreground="#666666"
+                                                   Margin="4,0"/>
+                                        <TextBlock Text="{Binding TimelineLabel}" 
+                                                   FontSize="12" 
+                                                   Foreground="#888888"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Open Button -->
+                                <Button Grid.Column="2" 
+                                        Content="Open ▶" 
+                                        Style="{StaticResource PrimaryButton}"
+                                        Click="OpenNote_Click"
+                                        Tag="{Binding}"
+                                        FontSize="13"
+                                        Margin="12,0,0,0"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Status Bar -->
+        <TextBlock x:Name="StatusText" 
+                   Grid.Row="4" 
+                   Text="Ready" 
+                   FontSize="12" 
+                   Foreground="#888888" 
+                   Margin="0,10,0,0"/>
+    </Grid>
+</Window>
