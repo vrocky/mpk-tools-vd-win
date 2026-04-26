@@ -1,6 +1,6 @@
 #define MyAppName "MPK Tools"
 #ifndef AppVersion
-  #define AppVersion "1.0.0"
+  #define AppVersion "1.1.0"
 #endif
 
 [Setup]
@@ -26,6 +26,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "Create desktop shortcuts"; GroupDescription: "Additional icons:"; Flags: unchecked
 
 [Files]
+Source: "dist\staging\Scripts\*.ico"; DestDir: "{app}\Scripts"; Flags: recursesubdirs createallsubdirs ignoreversion
 Source: "dist\staging\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs ignoreversion
 
 [Icons]
@@ -36,9 +37,6 @@ Name: "{group}\Sticky Notes Profile Picker"; Filename: "{app}\Apps\mpk-tools-sti
 Name: "{group}\Sticky Notes Profile Text Search"; Filename: "{app}\Apps\mpk-tools-sticky-notes-profile-text-search\StickyNotesProfileTextSearch.exe"
 Name: "{group}\Antigravity Profile Picker"; Filename: "{app}\Apps\mpk-tools-antigravity-profile-picker\AntigravityProfilePicker.exe"
 Name: "{group}\Antigravity Profile Project Search"; Filename: "{app}\Apps\mpk-tools-antigravity-profile-project-search\AntigravityProfileProjectSearch.exe"
-Name: "{group}\Edge Profile Picker"; Filename: "{app}\Apps\mpk-tools-win-virtual-desktop-edge-launch\EdgeProfilePicker.exe"
-Name: "{group}\Virtual Desktop Antigravity Picker"; Filename: "{app}\Apps\mpk-tools-win-virtual-desktop-antigravity-launch\AntigravityProfilePicker.exe"
-Name: "{group}\Virtual Desktop Sticky Notes Picker"; Filename: "{app}\Apps\mpk-tools-win-virtual-desktop-sticky-notes-launch\StickyNotesProfilePicker.exe"
 
 ; Script launchers
 Name: "{group}\Launch Chrome (Virtual Desktop)"; Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-chrome-launch\Launch-Chrome.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-chrome-launch"
@@ -56,9 +54,6 @@ Name: "{autodesktop}\MPK Sticky Notes Profile Picker"; Filename: "{app}\Apps\mpk
 Name: "{autodesktop}\MPK Sticky Notes Profile Text Search"; Filename: "{app}\Apps\mpk-tools-sticky-notes-profile-text-search\StickyNotesProfileTextSearch.exe"; Tasks: desktopicon
 Name: "{autodesktop}\MPK Antigravity Profile Picker"; Filename: "{app}\Apps\mpk-tools-antigravity-profile-picker\AntigravityProfilePicker.exe"; Tasks: desktopicon
 Name: "{autodesktop}\MPK Antigravity Profile Project Search"; Filename: "{app}\Apps\mpk-tools-antigravity-profile-project-search\AntigravityProfileProjectSearch.exe"; Tasks: desktopicon
-Name: "{autodesktop}\MPK Edge Profile Picker"; Filename: "{app}\Apps\mpk-tools-win-virtual-desktop-edge-launch\EdgeProfilePicker.exe"; Tasks: desktopicon
-Name: "{autodesktop}\MPK Virtual Desktop Antigravity Picker"; Filename: "{app}\Apps\mpk-tools-win-virtual-desktop-antigravity-launch\AntigravityProfilePicker.exe"; Tasks: desktopicon
-Name: "{autodesktop}\MPK Virtual Desktop Sticky Notes Picker"; Filename: "{app}\Apps\mpk-tools-win-virtual-desktop-sticky-notes-launch\StickyNotesProfilePicker.exe"; Tasks: desktopicon
 
 [Run]
 Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-antigravity-launch\Create-Shortcut.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-antigravity-launch"; Flags: runhidden runasoriginaluser

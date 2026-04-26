@@ -3,8 +3,9 @@
 param(
     [string]$Configuration = "Release",
     [string]$Runtime = "win-x64",
-    [string]$InstallerVersion = "1.0.0",
+    [string]$InstallerVersion = "1.1.0",
     [switch]$SkipPublish,
+    [switch]$ReusePublishedApps,
     [switch]$SkipCompileInstaller
 )
 
@@ -20,6 +21,25 @@ $stageRoot = Join-Path $distRoot "staging"
 $appsRoot = Join-Path $stageRoot "Apps"
 $scriptsRoot = Join-Path $stageRoot "Scripts"
 $outputRoot = Join-Path $distRoot "output"
+$shouldPublishApps = -not ($SkipPublish -or $ReusePublishedApps)
+
+function Remove-PathSafe {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if (-not (Test-Path $Path)) {
+        return
+    }
+
+    try {
+        Remove-Item -Path $Path -Recurse -Force -ErrorAction Stop
+    }
+    catch {
+        Write-Warning "Could not fully remove '$Path'. Continuing build with existing contents. $($_.Exception.Message)"
+    }
+}
 
 $wpfProjects = @(
     @{ Id = "mpk-tools-antigravity-profile-picker"; Project = "apps/mpk-tools-antigravity-profile-picker/AntigravityProfilePicker.csproj" },
@@ -27,15 +47,12 @@ $wpfProjects = @(
     @{ Id = "mpk-tools-sticky-notes-profile-picker"; Project = "apps/mpk-tools-sticky-notes-profile-picker/StickyNotesProfilePicker.csproj" },
     @{ Id = "mpk-tools-sticky-notes-profile-text-search"; Project = "apps/mpk-tools-sticky-notes-profile-text-search/StickyNotesProfileTextSearch.csproj" },
     @{ Id = "mpk-tools-vscode-profile-picker"; Project = "apps/mpk-tools-vscode-profile-picker/VsCodeProfilePicker.csproj" },
-    @{ Id = "mpk-tools-vscode-profile-project-search"; Project = "apps/mpk-tools-vscode-profile-project-search/VsCodeProfileProjectSearch.csproj" },
-    @{ Id = "mpk-tools-win-virtual-desktop-antigravity-launch"; Project = "launch/mpk-tools-win-virtual-desktop-antigravity-launch/AntigravityProfilePicker.csproj" },
-    @{ Id = "mpk-tools-win-virtual-desktop-edge-launch"; Project = "launch/mpk-tools-win-virtual-desktop-edge-launch/EdgeProfilePicker.csproj" },
-    @{ Id = "mpk-tools-win-virtual-desktop-sticky-notes-launch"; Project = "launch/mpk-tools-win-virtual-desktop-sticky-notes-launch/StickyNotesProfilePicker.csproj" }
+    @{ Id = "mpk-tools-vscode-profile-project-search"; Project = "apps/mpk-tools-vscode-profile-project-search/VsCodeProfileProjectSearch.csproj" }
 )
 
-$scriptSourceRoots = @($appsSourceRoot, $launchSourceRoot) | Where-Object { Test-Path $_ }
-if (-not $scriptSourceRoots -or $scriptSourceRoots.Count -eq 0) {
-    throw "No script source roots found. Expected directories: $appsSourceRoot and/or $launchSourceRoot"
+$scriptSourceRoots = @($launchSourceRoot) | Where-Object { Test-Path $_ }
+if (@($scriptSourceRoots).Count -eq 0) {
+    throw "No launch script source root found. Expected directory: $launchSourceRoot"
 }
 
 $scriptFiles = $scriptSourceRoots |
@@ -49,19 +66,29 @@ Where-Object {
 } |
 Sort-Object FullName
 
+$scriptAssetFiles = $scriptSourceRoots |
+ForEach-Object {
+    Get-ChildItem -Path $_ -Recurse -File -Filter "*.ico"
+} |
+Sort-Object FullName
+
 if (-not $scriptFiles -or $scriptFiles.Count -eq 0) {
     throw "No launcher or shortcut scripts were found to package."
 }
 
-if (Test-Path $distRoot) {
-    Remove-Item -Path $distRoot -Recurse -Force
+if ($shouldPublishApps) {
+    Remove-PathSafe -Path $distRoot
+}
+else {
+    Remove-PathSafe -Path $scriptsRoot
+    Remove-PathSafe -Path $outputRoot
 }
 
 New-Item -Path $appsRoot -ItemType Directory -Force | Out-Null
 New-Item -Path $scriptsRoot -ItemType Directory -Force | Out-Null
 New-Item -Path $outputRoot -ItemType Directory -Force | Out-Null
 
-if (-not $SkipPublish) {
+if ($shouldPublishApps) {
     foreach ($projectInfo in $wpfProjects) {
         $projectPath = Join-Path $repoRoot $projectInfo.Project
         if (-not (Test-Path $projectPath)) {
@@ -84,11 +111,14 @@ if (-not $SkipPublish) {
         }
     }
 }
+elseif (-not (Get-ChildItem -Path $appsRoot -Force -ErrorAction SilentlyContinue)) {
+    throw "ReusePublishedApps was requested but no staged app outputs were found in $appsRoot"
+}
 
-foreach ($scriptFile in $scriptFiles) {
+foreach ($scriptFile in @($scriptFiles) + @($scriptAssetFiles)) {
     $scriptRelPath = $scriptFile.FullName.Substring($repoRoot.Length + 1)
     $pathSegments = $scriptRelPath -split "[\\/]"
-    if ($pathSegments.Length -ge 2 -and ($pathSegments[0] -eq "apps" -or $pathSegments[0] -eq "launch")) {
+    if ($pathSegments.Length -ge 2 -and $pathSegments[0] -eq "launch") {
         $targetDir = Join-Path $scriptsRoot $pathSegments[1]
     }
     else {
