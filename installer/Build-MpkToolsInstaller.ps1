@@ -30,7 +30,7 @@ $wpfProjects = @(
     @{ Id = "mpk-tools-vscode-profile-project-search"; Project = "apps/mpk-tools-vscode-profile-project-search/VsCodeProfileProjectSearch.csproj" },
     @{ Id = "mpk-tools-win-virtual-desktop-antigravity-launch"; Project = "launch/mpk-tools-win-virtual-desktop-antigravity-launch/AntigravityProfilePicker.csproj" },
     @{ Id = "mpk-tools-win-virtual-desktop-edge-launch"; Project = "launch/mpk-tools-win-virtual-desktop-edge-launch/EdgeProfilePicker.csproj" },
-    @{ Id = "mpk-tools-win-virtual-desktop-sticky-notes-launch"; Project = "apps/mpk-tools-win-virtual-desktop-sticky-notes-launch/StickyNotesProfilePicker.csproj" }
+    @{ Id = "mpk-tools-win-virtual-desktop-sticky-notes-launch"; Project = "launch/mpk-tools-win-virtual-desktop-sticky-notes-launch/StickyNotesProfilePicker.csproj" }
 )
 
 $scriptSourceRoots = @($appsSourceRoot, $launchSourceRoot) | Where-Object { Test-Path $_ }

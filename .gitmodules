@@ -35,7 +35,7 @@
 	path = apps/mpk-tools-win-virtual-desktop-poc
 	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-poc.git
 [submodule "mpk-tools-win-virtual-desktop-sticky-notes-launch"]
-	path = apps/mpk-tools-win-virtual-desktop-sticky-notes-launch
+	path = launch/mpk-tools-win-virtual-desktop-sticky-notes-launch
 	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-sticky-notes-launch.git
 [submodule "mpk-tools-win-virtual-desktop-vscode-launch"]
 	path = launch/mpk-tools-win-virtual-desktop-vscode-launch
