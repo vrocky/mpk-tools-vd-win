@@ -49,10 +49,24 @@ Name: "{group}\Launch Sticky Notes (Virtual Desktop)"; Filename: "{sys}\WindowsP
 Name: "{group}\Launch Antigravity (Virtual Desktop)"; Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-antigravity-launch\Launch-AntiGravity.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-antigravity-launch"
 
 ; Optional desktop shortcuts for commonly used launchers
-Name: "{autodesktop}\MPK Launch Chrome (Virtual Desktop)"; Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-chrome-launch\Launch-Chrome.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-chrome-launch"; Tasks: desktopicon
-Name: "{autodesktop}\MPK Launch VS Code (Virtual Desktop)"; Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-vscode-launch\Launch-VSCode.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-vscode-launch"; Tasks: desktopicon
+; Optional desktop shortcuts for installed app executables
+Name: "{autodesktop}\MPK VS Code Profile Picker"; Filename: "{app}\Apps\mpk-tools-vscode-profile-picker\VsCodeProfilePicker.exe"; Tasks: desktopicon
+Name: "{autodesktop}\MPK VS Code Profile Project Search"; Filename: "{app}\Apps\mpk-tools-vscode-profile-project-search\VsCodeProfileProjectSearch.exe"; Tasks: desktopicon
+Name: "{autodesktop}\MPK Sticky Notes Profile Picker"; Filename: "{app}\Apps\mpk-tools-sticky-notes-profile-picker\StickyNotesProfilePicker.exe"; Tasks: desktopicon
+Name: "{autodesktop}\MPK Sticky Notes Profile Text Search"; Filename: "{app}\Apps\mpk-tools-sticky-notes-profile-text-search\StickyNotesProfileTextSearch.exe"; Tasks: desktopicon
+Name: "{autodesktop}\MPK Antigravity Profile Picker"; Filename: "{app}\Apps\mpk-tools-antigravity-profile-picker\AntigravityProfilePicker.exe"; Tasks: desktopicon
+Name: "{autodesktop}\MPK Antigravity Profile Project Search"; Filename: "{app}\Apps\mpk-tools-antigravity-profile-project-search\AntigravityProfileProjectSearch.exe"; Tasks: desktopicon
+Name: "{autodesktop}\MPK Edge Profile Picker"; Filename: "{app}\Apps\mpk-tools-win-virtual-desktop-edge-launch\EdgeProfilePicker.exe"; Tasks: desktopicon
+Name: "{autodesktop}\MPK Virtual Desktop Antigravity Picker"; Filename: "{app}\Apps\mpk-tools-win-virtual-desktop-antigravity-launch\AntigravityProfilePicker.exe"; Tasks: desktopicon
+Name: "{autodesktop}\MPK Virtual Desktop Sticky Notes Picker"; Filename: "{app}\Apps\mpk-tools-win-virtual-desktop-sticky-notes-launch\StickyNotesProfilePicker.exe"; Tasks: desktopicon
 
 [Run]
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-antigravity-launch\Create-Shortcut.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-antigravity-launch"; Flags: runhidden runasoriginaluser
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-chrome-launch\Create-Shortcut.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-chrome-launch"; Flags: runhidden runasoriginaluser
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-claude-launch\Create-Shortcut.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-claude-launch"; Flags: runhidden runasoriginaluser
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-edge-launch\Create-Shortcut.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-edge-launch"; Flags: runhidden runasoriginaluser
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-sticky-notes-launch\Create-Shortcut.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-sticky-notes-launch"; Flags: runhidden runasoriginaluser
+Filename: "{sys}\WindowsPowerShell\v1.0\powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\Scripts\mpk-tools-win-virtual-desktop-vscode-launch\Create-Shortcut.ps1"""; WorkingDir: "{app}\Scripts\mpk-tools-win-virtual-desktop-vscode-launch"; Flags: runhidden runasoriginaluser
 Filename: "{app}\Apps\mpk-tools-vscode-profile-picker\VsCodeProfilePicker.exe"; Description: "Launch VS Code Profile Picker"; Flags: postinstall shellexec skipifsilent unchecked
 
 [UninstallDelete]
