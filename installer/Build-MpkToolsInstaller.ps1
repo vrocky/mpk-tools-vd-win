@@ -13,6 +13,8 @@ $ErrorActionPreference = "Stop"
 
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $repoRoot = Split-Path -Parent $scriptRoot
+$appsSourceRoot = Join-Path $repoRoot "apps"
+$launchSourceRoot = Join-Path $repoRoot "launch"
 $distRoot = Join-Path $scriptRoot "dist"
 $stageRoot = Join-Path $distRoot "staging"
 $appsRoot = Join-Path $stageRoot "Apps"
@@ -20,27 +22,32 @@ $scriptsRoot = Join-Path $stageRoot "Scripts"
 $outputRoot = Join-Path $distRoot "output"
 
 $wpfProjects = @(
-    @{ Id = "mpk-tools-antigravity-profile-picker"; Project = "mpk-tools-antigravity-profile-picker/AntigravityProfilePicker.csproj" },
-    @{ Id = "mpk-tools-antigravity-profile-project-search"; Project = "mpk-tools-antigravity-profile-project-search/AntigravityProfileProjectSearch.csproj" },
-    @{ Id = "mpk-tools-sticky-notes-profile-picker"; Project = "mpk-tools-sticky-notes-profile-picker/StickyNotesProfilePicker.csproj" },
-    @{ Id = "mpk-tools-sticky-notes-profile-text-search"; Project = "mpk-tools-sticky-notes-profile-text-search/StickyNotesProfileTextSearch.csproj" },
-    @{ Id = "mpk-tools-vscode-profile-picker"; Project = "mpk-tools-vscode-profile-picker/VsCodeProfilePicker.csproj" },
-    @{ Id = "mpk-tools-vscode-profile-project-search"; Project = "mpk-tools-vscode-profile-project-search/VsCodeProfileProjectSearch.csproj" },
-    @{ Id = "mpk-tools-win-virtual-desktop-antigravity-launch"; Project = "mpk-tools-win-virtual-desktop-antigravity-launch/AntigravityProfilePicker.csproj" },
-    @{ Id = "mpk-tools-win-virtual-desktop-edge-launch"; Project = "mpk-tools-win-virtual-desktop-edge-launch/EdgeProfilePicker.csproj" },
-    @{ Id = "mpk-tools-win-virtual-desktop-sticky-notes-launch"; Project = "mpk-tools-win-virtual-desktop-sticky-notes-launch/StickyNotesProfilePicker.csproj" }
+    @{ Id = "mpk-tools-antigravity-profile-picker"; Project = "apps/mpk-tools-antigravity-profile-picker/AntigravityProfilePicker.csproj" },
+    @{ Id = "mpk-tools-antigravity-profile-project-search"; Project = "apps/mpk-tools-antigravity-profile-project-search/AntigravityProfileProjectSearch.csproj" },
+    @{ Id = "mpk-tools-sticky-notes-profile-picker"; Project = "apps/mpk-tools-sticky-notes-profile-picker/StickyNotesProfilePicker.csproj" },
+    @{ Id = "mpk-tools-sticky-notes-profile-text-search"; Project = "apps/mpk-tools-sticky-notes-profile-text-search/StickyNotesProfileTextSearch.csproj" },
+    @{ Id = "mpk-tools-vscode-profile-picker"; Project = "apps/mpk-tools-vscode-profile-picker/VsCodeProfilePicker.csproj" },
+    @{ Id = "mpk-tools-vscode-profile-project-search"; Project = "apps/mpk-tools-vscode-profile-project-search/VsCodeProfileProjectSearch.csproj" },
+    @{ Id = "mpk-tools-win-virtual-desktop-antigravity-launch"; Project = "launch/mpk-tools-win-virtual-desktop-antigravity-launch/AntigravityProfilePicker.csproj" },
+    @{ Id = "mpk-tools-win-virtual-desktop-edge-launch"; Project = "launch/mpk-tools-win-virtual-desktop-edge-launch/EdgeProfilePicker.csproj" },
+    @{ Id = "mpk-tools-win-virtual-desktop-sticky-notes-launch"; Project = "apps/mpk-tools-win-virtual-desktop-sticky-notes-launch/StickyNotesProfilePicker.csproj" }
 )
 
-$scriptFiles = Get-ChildItem -Path $repoRoot -Recurse -File -Filter "*.ps1" |
-    Where-Object {
-        $_.Name -like "Launch-*.ps1" -or
-        $_.Name -eq "CreateShortcut.ps1" -or
-        $_.Name -eq "Create-Shortcut.ps1"
-    } |
-    Where-Object {
-        $_.FullName -notlike "$distRoot*"
-    } |
-    Sort-Object FullName
+$scriptSourceRoots = @($appsSourceRoot, $launchSourceRoot) | Where-Object { Test-Path $_ }
+if (-not $scriptSourceRoots -or $scriptSourceRoots.Count -eq 0) {
+    throw "No script source roots found. Expected directories: $appsSourceRoot and/or $launchSourceRoot"
+}
+
+$scriptFiles = $scriptSourceRoots |
+ForEach-Object {
+    Get-ChildItem -Path $_ -Recurse -File -Filter "*.ps1"
+} |
+Where-Object {
+    $_.Name -like "Launch-*.ps1" -or
+    $_.Name -eq "CreateShortcut.ps1" -or
+    $_.Name -eq "Create-Shortcut.ps1"
+} |
+Sort-Object FullName
 
 if (-not $scriptFiles -or $scriptFiles.Count -eq 0) {
     throw "No launcher or shortcut scripts were found to package."
@@ -80,7 +87,13 @@ if (-not $SkipPublish) {
 
 foreach ($scriptFile in $scriptFiles) {
     $scriptRelPath = $scriptFile.FullName.Substring($repoRoot.Length + 1)
-    $targetDir = Join-Path $scriptsRoot (Split-Path $scriptRelPath -Parent)
+    $pathSegments = $scriptRelPath -split "[\\/]"
+    if ($pathSegments.Length -ge 2 -and ($pathSegments[0] -eq "apps" -or $pathSegments[0] -eq "launch")) {
+        $targetDir = Join-Path $scriptsRoot $pathSegments[1]
+    }
+    else {
+        $targetDir = Join-Path $scriptsRoot (Split-Path $scriptRelPath -Parent)
+    }
     New-Item -Path $targetDir -ItemType Directory -Force | Out-Null
     Copy-Item -Path $scriptFile.FullName -Destination $targetDir -Force
 }
