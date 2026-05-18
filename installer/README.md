@@ -7,6 +7,7 @@ This folder builds a single Windows installer (`.exe`) for your MPK tools.
 - Published WPF binaries for all `net8.0-windows` MPK desktop apps.
 - PowerShell launch scripts for virtual desktop launchers.
 - PowerShell shortcut scripts (`CreateShortcut.ps1` and `Create-Shortcut.ps1`) from MPK tool folders.
+- Standalone updater executable at `Updater\MPKToolsUpdater.exe`.
 - Start Menu shortcuts for all bundled apps and launchers.
 - Optional desktop shortcuts for common launchers.
 
@@ -42,6 +43,23 @@ Staging output:
 
 - `installer\dist\staging\Apps\...`
 - `installer\dist\staging\Scripts\...`
+- `installer\dist\staging\Updater\MPKToolsUpdater.exe`
+
+## Standalone updater usage
+
+After install, run the updater executable directly:
+
+```powershell
+"C:\Program Files\MPK Tools\Updater\MPKToolsUpdater.exe"
+```
+
+Requirements:
+- GitHub CLI (`gh`) installed and authenticated.
+- Installer release asset named like `MPK-Tools-Setup-<version>.exe`.
+
+Defaults:
+- Repository: `vrocky/mpk-tools-vd-win`
+- Asset pattern: `MPK-Tools-Setup-*.exe`
 
 ## Notes
 

@@ -20,8 +20,11 @@ $distRoot = Join-Path $scriptRoot "dist"
 $stageRoot = Join-Path $distRoot "staging"
 $appsRoot = Join-Path $stageRoot "Apps"
 $scriptsRoot = Join-Path $stageRoot "Scripts"
+$updaterRoot = Join-Path $stageRoot "Updater"
 $outputRoot = Join-Path $distRoot "output"
 $shouldPublishApps = -not ($SkipPublish -or $ReusePublishedApps)
+$shouldPublishUpdater = -not $SkipPublish
+$updaterProjectPath = Join-Path $scriptRoot "MPKToolsUpdater/MPKToolsUpdater.csproj"
 
 function Remove-PathSafe {
     param(
@@ -82,10 +85,15 @@ if ($shouldPublishApps) {
 else {
     Remove-PathSafe -Path $scriptsRoot
     Remove-PathSafe -Path $outputRoot
+
+    if ($shouldPublishUpdater) {
+        Remove-PathSafe -Path $updaterRoot
+    }
 }
 
 New-Item -Path $appsRoot -ItemType Directory -Force | Out-Null
 New-Item -Path $scriptsRoot -ItemType Directory -Force | Out-Null
+New-Item -Path $updaterRoot -ItemType Directory -Force | Out-Null
 New-Item -Path $outputRoot -ItemType Directory -Force | Out-Null
 
 if ($shouldPublishApps) {
@@ -110,9 +118,32 @@ if ($shouldPublishApps) {
             throw "dotnet publish failed for $projectPath"
         }
     }
+
 }
 elseif (-not (Get-ChildItem -Path $appsRoot -Force -ErrorAction SilentlyContinue)) {
     throw "ReusePublishedApps was requested but no staged app outputs were found in $appsRoot"
+}
+
+if ($shouldPublishUpdater) {
+    if (-not (Test-Path $updaterProjectPath)) {
+        throw "Updater project not found: $updaterProjectPath"
+    }
+
+    Write-Host "Publishing MPKToolsUpdater..." -ForegroundColor Cyan
+    dotnet publish $updaterProjectPath `
+        -c $Configuration `
+        -r $Runtime `
+        --self-contained true `
+        -p:PublishSingleFile=true `
+        -o $updaterRoot
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet publish failed for $updaterProjectPath"
+    }
+}
+
+if (-not (Get-ChildItem -Path $updaterRoot -File -ErrorAction SilentlyContinue)) {
+    throw "No updater output found in $updaterRoot. Run without -SkipPublish or stage updater artifacts first."
 }
 
 foreach ($scriptFile in @($scriptFiles) + @($scriptAssetFiles)) {
