@@ -1,3 +1,8 @@
+# MPK Tools v1.5 — Restructured Submodule Configuration
+# This file maps the submodules to the new directory structure
+# GitHub repo names remain unchanged; only local paths are reorganized
+
+# Desktop Applications (WPF)
 [submodule "src/desktop/MPK.VsCode.ProfilePicker"]
 	path = src/desktop/MPK.VsCode.ProfilePicker
 	url = https://github.com/vrocky/mpk-tools-vscode-profile-picker.git
@@ -10,6 +15,7 @@
 	path = src/desktop/MPK.AntiGravity.ProfilePicker
 	url = https://github.com/vrocky/mpk-tools-antigravity-profile-picker.git
 
+# Features (App-Specific Extensions)
 [submodule "src/features/MPK.VsCode.ProjectSearch"]
 	path = src/features/MPK.VsCode.ProjectSearch
 	url = https://github.com/vrocky/mpk-tools-vscode-profile-project-search.git
@@ -22,6 +28,7 @@
 	path = src/features/MPK.AntiGravity.ProjectSearch
 	url = https://github.com/vrocky/mpk-tools-antigravity-profile-project-search.git
 
+# Virtual Desktop Launch Scripts (PowerShell)
 [submodule "src/launchers/chrome"]
 	path = src/launchers/chrome
 	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-chrome-launch.git
@@ -46,10 +53,17 @@
 	path = src/launchers/antigravity
 	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-antigravity-launch.git
 
+# Shared Libraries
 [submodule "src/shared/MPK.Profile.Core"]
 	path = src/shared/MPK.Profile.Core
 	url = https://github.com/vrocky/mpk-tools-mpk-profile-common-libs.git
 
+# Tools
+[submodule "src/tools/MPK.Updater"]
+	path = src/tools/MPK.Updater
+	url = https://github.com/vrocky/mpk-tools-updater.git
+
+# Legacy (POC — Archive Only)
 [submodule "legacy/poc/virtual-desktop-poc"]
 	path = legacy/poc/virtual-desktop-poc
 	url = https://github.com/vrocky/mpk-tools-win-virtual-desktop-poc.git
