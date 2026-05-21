@@ -1,0 +1,73 @@
+﻿version: ''3''
+
+vars:
+  CONFIG: Release
+  DOTNET: dotnet
+
+tasks:
+  default:
+    desc: Build MPK Tools with incremental optimization
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File build/Build.ps1 -Configuration {{.CONFIG}}
+
+  build:
+    desc: Build MPK Tools
+    aliases: [b]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File build/Build.ps1 -Configuration {{.CONFIG}}
+
+  build:force:
+    desc: Force rebuild all apps (skip incremental optimization)
+    aliases: [rebuild]
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File build/Build.ps1 -Configuration {{.CONFIG}} -ForceRebuild
+
+  build:app:
+    desc: Build a single app by ID (e.g., task build:app -- MPK.VsCode.ProfilePicker)
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File build/Build.ps1 -Configuration {{.CONFIG}} -Only {{.CLI_ARGS}}
+
+  build:stage:
+    desc: Build and stage files (skip Inno Setup compilation)
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File build/Build.ps1 -Configuration {{.CONFIG}} -SkipCompileInstaller
+
+  clean:
+    desc: Remove build output (dist/ directory)
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -Command "if (Test-Path ''dist'') { Remove-Item -Recurse -Force dist }"
+
+  migrate:
+    desc: Migrate profiles from v1.5 to v1.6 (interactive)
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Migrate-Profiles.ps1
+
+  migrate:preview:
+    desc: Preview profile migration without making changes
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Migrate-Profiles.ps1 -DryRun
+
+  migrate:force:
+    desc: Migrate profiles without prompts (for automation)
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Migrate-Profiles.ps1 -Force
+
+  version:
+    desc: Show current version
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-Content VERSION"
+
+  version:set:
+    desc: Update version (e.g., task version:set -- 1.6.1)
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -Command "''{{.CLI_ARGS}}'' | Set-Content VERSION"
+
+  info:
+    desc: Show build and system information
+    cmds:
+      - powershell -NoProfile -ExecutionPolicy Bypass -Command "Write-Host ''MPK Tools Build Info'' -ForegroundColor Cyan; Write-Host ''''; Get-Content VERSION | ForEach-Object { Write-Host ''Version: $_'' }; Write-Host ''Config: {{.CONFIG}}''; Write-Host ''Dotnet: ''$({{.DOTNET}} --version)"
+
+  help:
+    desc: Show available tasks
+    cmds:
+      - task -l

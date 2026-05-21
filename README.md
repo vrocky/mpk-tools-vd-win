@@ -187,25 +187,46 @@ The updater queries the latest GitHub release, downloads the installer, and runs
 
 **Requirements:** .NET SDK 8+, Inno Setup 6+, PowerShell 5.1+
 
+**Option 1: With Taskfile (Recommended)**
+
+Install [Taskfile](https://taskfile.dev):
+```bash
+brew install go-task  # macOS
+scoop install task    # Windows
+```
+
+Then:
+```bash
+task              # Build
+task build:force  # Force rebuild all
+task clean        # Remove output
+task migrate      # Migrate v1.5→v1.6 profiles
+```
+
+See [TASKFILE.md](docs/versions/v1.6/TASKFILE.md) for all tasks.
+
+**Option 2: Direct PowerShell**
+
 ```powershell
 git clone --recursive https://github.com/vrocky/mpk-tools-vd-win.git
 cd mpk-tools-vd-win
 .\build\Build.ps1 -Configuration Release
 ```
 
-Output: `dist\output\MPK-Tools-Setup-1.5.0.exe`
+Output: `dist\output\MPK-Tools-Setup-1.6.0.exe`
 
-Version is read from the `VERSION` file at the repo root. Override:
+**Customization:**
 
+Version is read from `VERSION` file. Override:
 ```powershell
-.\build\Build.ps1 -Configuration Release -Version 1.5.1
+.\build\Build.ps1 -Configuration Release -Version 1.6.1
 ```
 
-Stage files without compiling the installer:
-
+Build parameters:
 ```powershell
-.\build\Build.ps1 -SkipCompileInstaller
-# Output at dist\staging\
+.\build\Build.ps1 -ForceRebuild              # Rebuild all apps
+.\build\Build.ps1 -Only MPK.VsCode.ProfilePicker  # Single app
+.\build\Build.ps1 -SkipCompileInstaller     # Stage files only
 ```
 
 ---
