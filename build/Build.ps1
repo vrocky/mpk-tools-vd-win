@@ -49,10 +49,20 @@ $updaterProj = Join-Path $repoRoot "src\tools\MPK.Updater\MPKToolsUpdater.csproj
 
 if (-not $Version) {
     $versionFile = Join-Path $repoRoot "VERSION"
-    $Version = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw).Trim() } else { "1.5.0" }
+    $Version = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw).Trim() } else { "1.6.0" }
 }
 
 Write-Host "Building MPK Tools v$Version ($Configuration)..." -ForegroundColor Cyan
+Write-Host ""
+
+# Validate prerequisites
+$dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
+if (-not $dotnet) {
+    Write-Error ".NET SDK not found. Install from https://dotnet.microsoft.com/download/dotnet/8.0"
+    exit 1
+}
+
+Write-Host "Using: $(dotnet --version)" -ForegroundColor DarkGray
 
 function Remove-PathSafe {
     param([Parameter(Mandatory)][string]$Path)
@@ -147,8 +157,9 @@ if ($skippedCount -gt 0) {
     Write-Host "  Skipped: $skippedCount apps (up-to-date)" -ForegroundColor DarkGray
 }
 
-if (-not (Get-ChildItem -Path $updaterRoot -File -ErrorAction SilentlyContinue)) {
-    throw "No updater output in $updaterRoot"
+$updaterFiles = Get-ChildItem -Path $updaterRoot -File -ErrorAction SilentlyContinue
+if (-not $updaterFiles) {
+    throw "Updater build failed: no output in $updaterRoot (expected MPKToolsUpdater.exe)"
 }
 
 foreach ($launcher in $launcherDirs) {

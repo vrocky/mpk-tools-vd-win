@@ -121,6 +121,8 @@ function New-LauncherShortcut {
         $shortcut.IconLocation = if (Test-Path $IconPath) { $IconPath } else { "powershell.exe" }
         $shortcut.WorkingDirectory = Split-Path $ScriptPath -Parent
 
+        $shortcut.Save()
+
         if ($RunAsAdmin) {
             # Set admin flag in shortcut (byte 0x15 of link file)
             $bytes = [System.IO.File]::ReadAllBytes($shortcutPath)
@@ -128,11 +130,11 @@ function New-LauncherShortcut {
             [System.IO.File]::WriteAllBytes($shortcutPath, $bytes)
         }
 
-        $shortcut.Save()
-        Write-Host "Created shortcut: $shortcutPath"
+        Write-Host "Created shortcut: $shortcutPath" -ForegroundColor Green
     }
     catch {
         Write-Error "Failed to create shortcut: $_"
+        throw
     }
 }
 
