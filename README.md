@@ -253,17 +253,19 @@ git clone --recursive https://github.com/vrocky/mpk-tools-vd-win.git
 
 ## Profile Data Locations
 
-All profile data is stored outside `Program Files` and is never modified by the installer or updater.
+All profile data is stored in `C:\MPKTools\Profiles\` (v1.6+) and is never modified by the installer or updater.
 
 | Application | Profile Root |
 |-------------|-------------|
-| Chrome | `C:\ChromeProfiles\` |
-| Edge | `C:\EdgeProfiles\` |
-| VS Code (launcher) | `C:\VSCodeProfiles\` |
-| VS Code (picker) | Configurable — any directory you register |
-| Sticky Notes | `C:\StickyNotesProfiles\` |
-| AntiGravity | `C:\AntiGravityProfiles\` |
-| Claude Code | `C:\claude-ws\vd-profiles\` |
+| Chrome | `C:\MPKTools\Profiles\chrome\` |
+| Edge | `C:\MPKTools\Profiles\edge\` |
+| VS Code (launcher) | `C:\MPKTools\Profiles\vscode\` |
+| VS Code (picker) | Configurable — defaults to `C:\MPKTools\Profiles\vscode\` |
+| Sticky Notes | `C:\MPKTools\Profiles\sticky-notes\` |
+| AntiGravity | `C:\MPKTools\Profiles\antigravity\` |
+| Claude Code | `C:\MPKTools\Profiles\claude\` |
+
+**Migrating from v1.5?** See [`docs/versions/v1.6/PROFILE_MIGRATION.md`](docs/versions/v1.6/PROFILE_MIGRATION.md) for step-by-step instructions.
 
 ---
 

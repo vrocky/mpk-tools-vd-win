@@ -40,8 +40,11 @@ function Get-ProfilePath {
     <#
     .SYNOPSIS
     Constructs the profile path for an app on a specific virtual desktop.
+    .DESCRIPTION
+    Returns the path to an app's profile directory under C:\MPKTools\Profiles\[app]\virtual_desktop_[N]
+    or C:\MPKTools\Profiles\[app]\vd-[N] for Claude (special case).
     .PARAMETER AppName
-    Application name (e.g., 'chrome', 'vscode', 'claude')
+    Application name (e.g., 'chrome', 'vscode', 'claude', 'edge', 'sticky-notes', 'antigravity')
     .PARAMETER Desktop
     Virtual desktop number. If 0, detects current desktop automatically.
     .PARAMETER CreateIfMissing
@@ -59,12 +62,14 @@ function Get-ProfilePath {
     )
 
     $desktopNum = if ($Desktop -gt 0) { $Desktop } else { Get-VDNumber }
+    $profileRoot = "C:\MPKTools\Profiles"
 
     $path = if ($AppName -eq 'claude') {
-        # Claude uses 'vd-N' format for its session directories
-        "C:\MPKTools\Profiles\$AppName\vd-$desktopNum"
+        # Claude uses 'vd-N' format (session-based, not profile-based)
+        "$profileRoot\$AppName\vd-$desktopNum"
     } else {
-        "C:\MPKTools\Profiles\$AppName\virtual_desktop_$desktopNum"
+        # All other apps: [app]\virtual_desktop_[N]
+        "$profileRoot\$AppName\virtual_desktop_$desktopNum"
     }
 
     if ($CreateIfMissing -and -not (Test-Path $path)) {
