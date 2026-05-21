@@ -1,11 +1,35 @@
 #Requires -Version 5.1
+<#
+.SYNOPSIS
+    Build and package MPK Tools with framework-dependent publishing and incremental builds.
+
+.PARAMETER Configuration
+    Build configuration: Release or Debug. Default: Release
+
+.PARAMETER Version
+    Override version from VERSION file. Default: read from VERSION file
+
+.PARAMETER ForceRebuild
+    Force rebuild of all apps, skipping incremental build optimization
+
+.PARAMETER Only
+    Build only a specific app by ID (e.g., "MPK.VsCode.ProfilePicker")
+
+.PARAMETER SkipCompileInstaller
+    Build apps and stage files, but skip Inno Setup compilation
+
+.EXAMPLE
+    .\build\Build.ps1                    # Full build with incremental optimization
+    .\build\Build.ps1 -ForceRebuild      # Force rebuild all apps
+    .\build\Build.ps1 -Only MPK.VsCode.ProfilePicker -ForceRebuild  # Rebuild one app
+    .\build\Build.ps1 -SkipCompileInstaller  # Stage files without installer
+#>
 [CmdletBinding()]
 param(
     [string]$Configuration = "Release",
-    [string]$Runtime = "win-x64",
     [string]$Version,
-    [switch]$SkipPublish,
-    [switch]$ReusePublishedApps,
+    [switch]$ForceRebuild,
+    [string]$Only,
     [switch]$SkipCompileInstaller
 )
 
@@ -23,9 +47,6 @@ $outputRoot  = Join-Path $distRoot "output"
 $issFile     = Join-Path $repoRoot "packaging\inno\MPKTools.iss"
 $updaterProj = Join-Path $repoRoot "src\tools\MPK.Updater\MPKToolsUpdater.csproj"
 
-$shouldPublishApps    = -not ($SkipPublish -or $ReusePublishedApps)
-$shouldPublishUpdater = -not $SkipPublish
-
 if (-not $Version) {
     $versionFile = Join-Path $repoRoot "VERSION"
     $Version = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw).Trim() } else { "1.5.0" }
@@ -40,19 +61,31 @@ function Remove-PathSafe {
     catch { Write-Warning "Could not fully remove '$Path'. $($_.Exception.Message)" }
 }
 
-$desktopProjects = @(
+function Should-Republish {
+    param(
+        [Parameter(Mandatory)][string]$ProjectPath,
+        [Parameter(Mandatory)][string]$OutputPath,
+        [bool]$Force = $false
+    )
+    if ($Force) { return $true }
+    if (-not (Test-Path $OutputPath)) { return $true }
+
+    $sourceNewest = Get-ChildItem -Path (Split-Path $ProjectPath) -Include "*.cs","*.xaml","*.csproj" -Recurse -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $outputNewest = Get-ChildItem -Path $OutputPath -Recurse -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    return ($null -eq $sourceNewest -or $null -eq $outputNewest -or $sourceNewest.LastWriteTime -gt $outputNewest.LastWriteTime)
+}
+
+$allApps = @(
     @{ Id = "MPK.VsCode.ProfilePicker";      Project = "src\desktop\MPK.VsCode.ProfilePicker\VsCodeProfilePicker.csproj" },
     @{ Id = "MPK.StickyNotes.ProfilePicker"; Project = "src\desktop\MPK.StickyNotes.ProfilePicker\StickyNotesProfilePicker.csproj" },
-    @{ Id = "MPK.AntiGravity.ProfilePicker"; Project = "src\desktop\MPK.AntiGravity.ProfilePicker\AntigravityProfilePicker.csproj" }
-)
-
-$featureProjects = @(
+    @{ Id = "MPK.AntiGravity.ProfilePicker"; Project = "src\desktop\MPK.AntiGravity.ProfilePicker\AntigravityProfilePicker.csproj" },
     @{ Id = "MPK.VsCode.ProjectSearch";      Project = "src\features\MPK.VsCode.ProjectSearch\VsCodeProfileProjectSearch.csproj" },
     @{ Id = "MPK.StickyNotes.TextSearch";    Project = "src\features\MPK.StickyNotes.TextSearch\StickyNotesProfileTextSearch.csproj" },
     @{ Id = "MPK.AntiGravity.ProjectSearch"; Project = "src\features\MPK.AntiGravity.ProjectSearch\AntigravityProfileProjectSearch.csproj" }
 )
-
-$allWpfProjects = $desktopProjects + $featureProjects
 
 $launcherDirs = @(
     @{ Id = "chrome";       Path = "src\launchers\chrome" },
@@ -63,47 +96,59 @@ $launcherDirs = @(
     @{ Id = "antigravity";  Path = "src\launchers\antigravity" }
 )
 
-if ($shouldPublishApps) {
-    Remove-PathSafe -Path $distRoot
-} else {
-    Remove-PathSafe -Path $scriptsRoot
-    Remove-PathSafe -Path $outputRoot
-    if ($shouldPublishUpdater) { Remove-PathSafe -Path $updaterRoot }
-}
-
+Remove-PathSafe -Path $outputRoot
 New-Item -Path $appsRoot    -ItemType Directory -Force | Out-Null
 New-Item -Path $scriptsRoot -ItemType Directory -Force | Out-Null
 New-Item -Path $updaterRoot -ItemType Directory -Force | Out-Null
 New-Item -Path $outputRoot  -ItemType Directory -Force | Out-Null
 
-if ($shouldPublishApps) {
-    foreach ($proj in $allWpfProjects) {
-        $projPath = Join-Path $repoRoot $proj.Project
-        if (-not (Test-Path $projPath)) {
-            Write-Warning "Project not found, skipping: $projPath"
-            continue
-        }
-        Write-Host "  Publishing $($proj.Id)..." -ForegroundColor Cyan
-        dotnet publish $projPath -c $Configuration -r $Runtime `
-            --self-contained true -p:PublishSingleFile=true `
-            -p:IncludeNativeLibrariesForSelfExtract=true `
-            -o (Join-Path $appsRoot $proj.Id)
-        if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $projPath" }
+$publishedCount = 0
+$skippedCount = 0
+
+foreach ($app in $allApps) {
+    if ($Only -and $app.Id -ne $Only) { continue }
+
+    $projPath = Join-Path $repoRoot $app.Project
+    if (-not (Test-Path $projPath)) {
+        Write-Warning "Project not found, skipping: $projPath"
+        continue
     }
-} elseif (-not (Get-ChildItem -Path $appsRoot -Force -ErrorAction SilentlyContinue)) {
-    throw "ReusePublishedApps was set but no staged outputs found in $appsRoot"
+
+    $outDir = Join-Path $appsRoot $app.Id
+    if (-not (Should-Republish -ProjectPath $projPath -OutputPath $outDir -Force $ForceRebuild)) {
+        Write-Host "  [$($app.Id)] Up-to-date, skipping" -ForegroundColor DarkGray
+        $skippedCount++
+        continue
+    }
+
+    Write-Host "  Publishing $($app.Id)..." -ForegroundColor Cyan
+    dotnet publish $projPath -c $Configuration `
+        -p:PublishReadyToRun=false `
+        -o $outDir
+    if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $projPath" }
+    $publishedCount++
 }
 
-if ($shouldPublishUpdater) {
-    if (-not (Test-Path $updaterProj)) { throw "Updater project not found: $updaterProj" }
+if (-not (Test-Path $updaterProj)) { throw "Updater project not found: $updaterProj" }
+if (Should-Republish -ProjectPath $updaterProj -OutputPath $updaterRoot -Force $ForceRebuild) {
     Write-Host "  Publishing MPKToolsUpdater..." -ForegroundColor Cyan
-    dotnet publish $updaterProj -c $Configuration -r $Runtime `
-        --self-contained true -p:PublishSingleFile=true -o $updaterRoot
+    dotnet publish $updaterProj -c $Configuration -o $updaterRoot
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $updaterProj" }
+    $publishedCount++
+} else {
+    Write-Host "  [MPKToolsUpdater] Up-to-date, skipping" -ForegroundColor DarkGray
+    $skippedCount++
+}
+
+if ($publishedCount -gt 0) {
+    Write-Host "  Published: $publishedCount apps" -ForegroundColor Green
+}
+if ($skippedCount -gt 0) {
+    Write-Host "  Skipped: $skippedCount apps (up-to-date)" -ForegroundColor DarkGray
 }
 
 if (-not (Get-ChildItem -Path $updaterRoot -File -ErrorAction SilentlyContinue)) {
-    throw "No updater output in $updaterRoot. Run without -SkipPublish or stage artifacts first."
+    throw "No updater output in $updaterRoot"
 }
 
 foreach ($launcher in $launcherDirs) {
@@ -112,7 +157,7 @@ foreach ($launcher in $launcherDirs) {
     $dstPath = Join-Path $scriptsRoot $launcher.Id
     New-Item -Path $dstPath -ItemType Directory -Force | Out-Null
     Get-ChildItem -Path $srcPath -File |
-        Where-Object { $_.Name -like "Launch-*.ps1" -or $_.Name -eq "CreateShortcut.ps1" -or $_.Name -eq "Create-Shortcut.ps1" -or $_.Extension -eq ".ico" } |
+        Where-Object { $_.Name -like "Launch-*.ps1" -or $_.Name -eq "Create-Shortcut.ps1" -or $_.Extension -eq ".ico" } |
         ForEach-Object { Copy-Item $_.FullName -Destination $dstPath -Force }
 }
 

@@ -19,6 +19,32 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin
 
+[Code]
+function CheckDotNetRuntime: Boolean;
+var
+  InstallPath: String;
+begin
+  Result := True;
+
+  // Check for .NET 8 Desktop Runtime in the registry
+  // Framework-dependent apps require .NET 8 Desktop Runtime to be installed
+  if not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{03a59918-ec21-42bc-87fd-6ad2a67df3b1}') then
+  begin
+    if MsgBox('This application requires .NET 8 Desktop Runtime.' + #13#13 +
+              'Please install it from: https://dotnet.microsoft.com/download/dotnet/8.0' + #13#13 +
+              'Click OK to continue, or Cancel to exit.', mbConfirmation, MB_OKCANCEL) = IDCANCEL then
+    begin
+      Result := False;
+    end;
+  end;
+end;
+
+procedure InitializeWizard;
+begin
+  if not CheckDotNetRuntime then
+    Abort;
+end;
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
