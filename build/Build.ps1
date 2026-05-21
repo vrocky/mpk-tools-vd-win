@@ -79,12 +79,12 @@ function Should-Republish {
 }
 
 $allApps = @(
-    @{ Id = "MPK.VsCode.ProfilePicker";      Project = "src\desktop\MPK.VsCode.ProfilePicker\VsCodeProfilePicker.csproj" },
-    @{ Id = "MPK.StickyNotes.ProfilePicker"; Project = "src\desktop\MPK.StickyNotes.ProfilePicker\StickyNotesProfilePicker.csproj" },
-    @{ Id = "MPK.AntiGravity.ProfilePicker"; Project = "src\desktop\MPK.AntiGravity.ProfilePicker\AntigravityProfilePicker.csproj" },
-    @{ Id = "MPK.VsCode.ProjectSearch";      Project = "src\features\MPK.VsCode.ProjectSearch\VsCodeProfileProjectSearch.csproj" },
-    @{ Id = "MPK.StickyNotes.TextSearch";    Project = "src\features\MPK.StickyNotes.TextSearch\StickyNotesProfileTextSearch.csproj" },
-    @{ Id = "MPK.AntiGravity.ProjectSearch"; Project = "src\features\MPK.AntiGravity.ProjectSearch\AntigravityProfileProjectSearch.csproj" }
+    @{ Id = "MPK.VsCode.ProfilePicker";      Project = "src\apps\MPK.VsCode.ProfilePicker\VsCodeProfilePicker.csproj" },
+    @{ Id = "MPK.StickyNotes.ProfilePicker"; Project = "src\apps\MPK.StickyNotes.ProfilePicker\StickyNotesProfilePicker.csproj" },
+    @{ Id = "MPK.AntiGravity.ProfilePicker"; Project = "src\apps\MPK.AntiGravity.ProfilePicker\AntigravityProfilePicker.csproj" },
+    @{ Id = "MPK.VsCode.ProjectSearch";      Project = "src\apps\MPK.VsCode.ProjectSearch\VsCodeProfileProjectSearch.csproj" },
+    @{ Id = "MPK.StickyNotes.TextSearch";    Project = "src\apps\MPK.StickyNotes.TextSearch\StickyNotesProfileTextSearch.csproj" },
+    @{ Id = "MPK.AntiGravity.ProjectSearch"; Project = "src\apps\MPK.AntiGravity.ProjectSearch\AntigravityProfileProjectSearch.csproj" }
 )
 
 $launcherDirs = @(

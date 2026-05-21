@@ -1,25 +1,25 @@
-[submodule "src/desktop/MPK.VsCode.ProfilePicker"]
-	path = src/desktop/MPK.VsCode.ProfilePicker
+[submodule "src/apps/MPK.VsCode.ProfilePicker"]
+	path = src/apps/MPK.VsCode.ProfilePicker
 	url = https://github.com/vrocky/mpk-tools-vscode-profile-picker.git
 
-[submodule "src/desktop/MPK.StickyNotes.ProfilePicker"]
-	path = src/desktop/MPK.StickyNotes.ProfilePicker
+[submodule "src/apps/MPK.StickyNotes.ProfilePicker"]
+	path = src/apps/MPK.StickyNotes.ProfilePicker
 	url = https://github.com/vrocky/mpk-tools-sticky-notes-profile-picker.git
 
-[submodule "src/desktop/MPK.AntiGravity.ProfilePicker"]
-	path = src/desktop/MPK.AntiGravity.ProfilePicker
+[submodule "src/apps/MPK.AntiGravity.ProfilePicker"]
+	path = src/apps/MPK.AntiGravity.ProfilePicker
 	url = https://github.com/vrocky/mpk-tools-antigravity-profile-picker.git
 
-[submodule "src/features/MPK.VsCode.ProjectSearch"]
-	path = src/features/MPK.VsCode.ProjectSearch
+[submodule "src/apps/MPK.VsCode.ProjectSearch"]
+	path = src/apps/MPK.VsCode.ProjectSearch
 	url = https://github.com/vrocky/mpk-tools-vscode-profile-project-search.git
 
-[submodule "src/features/MPK.StickyNotes.TextSearch"]
-	path = src/features/MPK.StickyNotes.TextSearch
+[submodule "src/apps/MPK.StickyNotes.TextSearch"]
+	path = src/apps/MPK.StickyNotes.TextSearch
 	url = https://github.com/vrocky/mpk-tools-sticky-notes-profile-text-search.git
 
-[submodule "src/features/MPK.AntiGravity.ProjectSearch"]
-	path = src/features/MPK.AntiGravity.ProjectSearch
+[submodule "src/apps/MPK.AntiGravity.ProjectSearch"]
+	path = src/apps/MPK.AntiGravity.ProjectSearch
 	url = https://github.com/vrocky/mpk-tools-antigravity-profile-project-search.git
 
 [submodule "src/launchers/chrome"]

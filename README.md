@@ -216,15 +216,15 @@ This repo is a monorepo containing 14 git submodules — one per component.
 
 ```
 src/
-├── desktop/                   WPF profile picker applications
+├── apps/                      WPF profile picker and search applications
 │   ├── MPK.VsCode.ProfilePicker/
 │   ├── MPK.StickyNotes.ProfilePicker/
-│   └── MPK.AntiGravity.ProfilePicker/
-├── features/                  App-specific search utilities
+│   ├── MPK.AntiGravity.ProfilePicker/
 │   ├── MPK.VsCode.ProjectSearch/
 │   ├── MPK.StickyNotes.TextSearch/
 │   └── MPK.AntiGravity.ProjectSearch/
 ├── launchers/                 PowerShell virtual desktop launchers
+│   ├── _shared/               Shared PowerShell module (VD detection, profiles, shortcuts)
 │   ├── chrome/
 │   ├── edge/
 │   ├── vscode/
