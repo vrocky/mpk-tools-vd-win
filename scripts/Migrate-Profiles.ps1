@@ -42,14 +42,19 @@ $migrations = @(
     @{ OldRoot = "C:\claude-ws\vd-profiles"; NewApp = "claude" }
 )
 
-Write-Host "MPK Tools v1.5 → v1.6 Profile Migration" -ForegroundColor Cyan
-Write-Host "=========================================" -ForegroundColor Cyan
 Write-Host ""
+Write-Host "╔════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║  MPK Tools v1.5 → v1.6 Profile Migration  ║" -ForegroundColor Cyan
+Write-Host "╚════════════════════════════════════════════╝" -ForegroundColor Cyan
+Write-Host ""
+
+Write-Host "🔍 Scanning for v1.5 profiles..." -ForegroundColor Cyan
 
 # Find profiles to migrate
 $toMigrate = @()
 foreach ($item in $migrations) {
     if (Test-Path $item.OldRoot) {
+        Write-Host "   Found: $($item.OldRoot)" -ForegroundColor DarkGray
         $size = (Get-ChildItem -Path $item.OldRoot -Recurse -File -ErrorAction SilentlyContinue |
             Measure-Object -Property Length -Sum).Sum
         $toMigrate += @{
@@ -60,76 +65,100 @@ foreach ($item in $migrations) {
     }
 }
 
+Write-Host ""
+
 if ($toMigrate.Count -eq 0) {
-    Write-Host "No v1.5 profiles found. Already migrated or nothing to migrate." -ForegroundColor Green
+    Write-Host "✅ No v1.5 profiles found." -ForegroundColor Green
+    Write-Host "   Either already migrated or starting fresh." -ForegroundColor DarkGray
     exit 0
 }
 
-Write-Host "Found $($toMigrate.Count) profile(s) to migrate:" -ForegroundColor Yellow
+Write-Host "📦 Migration Plan:" -ForegroundColor Cyan
 Write-Host ""
 
 $totalSize = 0
 foreach ($item in $toMigrate) {
     $sizeMB = [math]::Round($item.SizeBytes / 1MB, 2)
-    Write-Host "  • $($item.OldRoot)" -ForegroundColor DarkGray
-    Write-Host "    → $ProfileRoot\$($item.NewApp)\ ($sizeMB MB)" -ForegroundColor Green
+    Write-Host "   • $($item.OldRoot)" -ForegroundColor Yellow
+    Write-Host "     ↓" -ForegroundColor DarkGray
+    Write-Host "     $ProfileRoot\$($item.NewApp)\" -ForegroundColor Green
+    Write-Host "     Size: $sizeMB MB" -ForegroundColor DarkGray
+    Write-Host ""
     $totalSize += $item.SizeBytes
 }
 
 $totalMB = [math]::Round($totalSize / 1MB, 2)
+Write-Host "📊 Total: $($toMigrate.Count) profile(s), $totalMB MB" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Total size to migrate: $totalMB MB" -ForegroundColor Yellow
 
 if ($DryRun) {
-    Write-Host ""
-    Write-Host "DRY RUN - no changes made. Run without -DryRun to migrate." -ForegroundColor Cyan
+    Write-Host "🔍 DRY RUN MODE" -ForegroundColor Yellow
+    Write-Host "   No changes will be made. Use without -DryRun to actually migrate." -ForegroundColor DarkGray
     exit 0
 }
 
 if (-not $Force) {
+    Write-Host "⚠️  LIVE MIGRATION" -ForegroundColor Yellow
+    Write-Host "   This will move your profiles to the new location." -ForegroundColor DarkGray
+    Write-Host "   A backup will be created at: $BackupRoot" -ForegroundColor DarkGray
     Write-Host ""
-    $confirm = Read-Host "Proceed with migration? (yes/no)"
+    $confirm = Read-Host "Type 'yes' to proceed with migration"
     if ($confirm -ne "yes") {
-        Write-Host "Migration cancelled." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "❌ Migration cancelled." -ForegroundColor Yellow
         exit 0
     }
 }
 
 Write-Host ""
-Write-Host "Creating backup..." -ForegroundColor Cyan
+Write-Host "💾 Step 1: Creating Backup" -ForegroundColor Cyan
 New-Item -ItemType Directory -Path $BackupRoot -Force | Out-Null
 
+$backupCount = 0
 foreach ($item in $toMigrate) {
     $backupDest = Join-Path $BackupRoot $item.NewApp
-    Write-Host "  Backing up $($item.OldRoot) → $backupDest" -ForegroundColor DarkGray
-    robocopy "$($item.OldRoot)" "$backupDest" /S /E /DCOPY:DAT /COPY:DAT /IS /IT /XJ /R:0 | Out-Null
+    Write-Host "   Backing up: $($item.NewApp)" -ForegroundColor DarkGray
+    robocopy "$($item.OldRoot)" "$backupDest" /S /E /DCOPY:DAT /COPY:DAT /IS /IT /XJ /R:0 /NJH /NJS | Out-Null
+    $backupCount++
 }
 
-Write-Host "✓ Backup complete at $BackupRoot" -ForegroundColor Green
+Write-Host "   ✓ Backup created ($backupCount items)" -ForegroundColor Green
+Write-Host "   Location: $BackupRoot" -ForegroundColor DarkGray
 Write-Host ""
-Write-Host "Moving profiles to new structure..." -ForegroundColor Cyan
 
+Write-Host "📦 Step 2: Moving Profiles" -ForegroundColor Cyan
+$moveCount = 0
 foreach ($item in $toMigrate) {
     $newDest = Join-Path $ProfileRoot $item.NewApp
-    Write-Host "  Moving $($item.OldRoot) → $newDest" -ForegroundColor DarkGray
+    Write-Host "   Moving: $($item.NewApp)" -ForegroundColor DarkGray
 
     New-Item -ItemType Directory -Path $newDest -Force | Out-Null
 
-    robocopy "$($item.OldRoot)" "$newDest" /S /E /MOVE /DCOPY:DAT /COPY:DAT /IS /IT /XJ /R:0 | Out-Null
+    robocopy "$($item.OldRoot)" "$newDest" /S /E /MOVE /DCOPY:DAT /COPY:DAT /IS /IT /XJ /R:0 /NJH /NJS | Out-Null
 
     if (Test-Path $item.OldRoot) {
         Remove-Item $item.OldRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
+    $moveCount++
 }
 
-Write-Host "✓ Profiles moved to new locations" -ForegroundColor Green
+Write-Host "   ✓ Profiles moved ($moveCount items)" -ForegroundColor Green
+
 Write-Host ""
-Write-Host "Migration complete!" -ForegroundColor Green
+Write-Host "✅ Migration Complete!" -ForegroundColor Green
 Write-Host ""
-Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "  1. Install MPK Tools v1.6"
-Write-Host "  2. Run Create-Shortcut.ps1 in each launcher (or reinstall to auto-run)"
-Write-Host "  3. Verify: launch an app and confirm it opens with your existing data"
+Write-Host "📋 Summary:" -ForegroundColor Cyan
+Write-Host "   ✓ Profiles moved to $ProfileRoot\" -ForegroundColor Green
+Write-Host "   ✓ Backup saved to $BackupRoot\" -ForegroundColor Green
 Write-Host ""
-Write-Host "If something goes wrong, rollback is available at:" -ForegroundColor Yellow
-Write-Host "  $BackupRoot"
+
+Write-Host "🚀 Next Steps:" -ForegroundColor Cyan
+Write-Host "   1. Install MPK Tools v1.6" -ForegroundColor Yellow
+Write-Host "   2. Run: .\src\launchers\chrome\Create-Shortcut.ps1 (etc for each launcher)" -ForegroundColor Yellow
+Write-Host "   3. Test: Launch an app and verify it has your existing data" -ForegroundColor Yellow
+Write-Host ""
+
+Write-Host "💾 Rollback Available:" -ForegroundColor Yellow
+Write-Host "   If anything goes wrong, your original profiles are safe at:" -ForegroundColor DarkGray
+Write-Host "   $BackupRoot\" -ForegroundColor DarkGray
+Write-Host ""

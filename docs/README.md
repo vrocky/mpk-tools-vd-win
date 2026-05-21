@@ -1,219 +1,172 @@
 # MPK Tools Documentation
 
-Welcome to the MPK Tools documentation. This directory contains project architecture, guides, and processes.
+Complete documentation for MPK Tools v1.6 — architecture, setup, and development guides.
 
 ---
 
-## Quick Navigation
+## 🚀 Getting Started
 
-### 📋 Project Overview
-- **[`.project.md`](../.project.md)** — Comprehensive project context, current issues, and recommendations
-  - Start here to understand the project structure and why restructuring is needed
+### For Users
+- **[README.md](../README.md)** — Project overview, features, and installation
+- **[v1.6/INSTALL.md](versions/v1.6/INSTALL.md)** — Installation, migration from v1.5, profile locations
+- **[v1.6/UPDATES.md](versions/v1.6/UPDATES.md)** — What's new in v1.6 (smaller installer, faster builds, simpler launchers)
 
-### 🏗️ Architecture & Restructuring
-- **[`RESTRUCTURING-STATUS.md`](RESTRUCTURING-STATUS.md)** — Current status of v1.5 restructuring effort
-  - What's been done, what's pending, and success criteria
+### For Developers
+- **[v1.6/UNDERSTANDING.md](versions/v1.6/UNDERSTANDING.md)** — How the system works, file purposes, error messages
+- **[v1.6/TASKFILE.md](versions/v1.6/TASKFILE.md)** — Task runner for building (recommended method)
+- **[BUILD.md](../Taskfile.yml)** — Build system configuration
 
-- **[`architecture/v1.5-restructuring-proposal.md`](architecture/v1.5-restructuring-proposal.md)** — Detailed v1.5 design
-  - Why the new structure is better
-  - How the build process will change
-  - What the final directory layout will look like
-
-- **[`architecture/MIGRATION-GUIDE-v1.5.md`](architecture/MIGRATION-GUIDE-v1.5.md)** — Step-by-step migration guide
-  - Preparation phase
-  - Submodule reorganization
-  - Build script updates
-  - Testing and verification
-  - Rollback procedures
-
-### 👨‍💻 For Developers
-*Documentation guides for contributors (to be created)*
-
-- `guides/development.md` — How to build and run the project locally
-- `guides/adding-new-app.md` — How to add a new desktop application
-- `guides/adding-new-launcher.md` — How to add a new virtual desktop launcher
-- `guides/contributing.md` — Contributing guidelines and code standards
-
-### 🔄 Operational & Process Docs
-*Process documentation (to be created)*
-
-- `process/release-process.md` — How to cut a release
-- `process/versioning-policy.md` — Semantic versioning rules
-- `process/update-mechanism.md` — How the auto-update system works
+### For v1.5 Users Migrating to v1.6
+- **[v1.6/PROFILE_MIGRATION.md](versions/v1.6/PROFILE_MIGRATION.md)** — Automatic migration tool for profile folders
+- **[v1.6/INSTALL.md](versions/v1.6/INSTALL.md)** — Step-by-step migration walkthrough
 
 ---
 
-## Files by Purpose
+## 📚 Version Documentation
 
-### Planning & Status
-| File | Purpose |
-|------|---------|
-| `.project.md` (root) | Project analysis and context |
-| `RESTRUCTURING-STATUS.md` | v1.5 restructuring progress |
-| `.gitmodules.v1.5` (root) | Reference for new submodule paths |
+### v1.6 (Current)
+**Complete v1.6 implementation — simplified, fast, robust**
 
-### Architecture & Design
-| File | Purpose |
-|------|---------|
-| `architecture/v1.5-restructuring-proposal.md` | v1.5 architecture proposal |
-| `architecture/MIGRATION-GUIDE-v1.5.md` | Step-by-step migration |
+| Document | Purpose |
+|----------|---------|
+| [UPDATES.md](versions/v1.6/UPDATES.md) | What changed, why, improvements |
+| [INSTALL.md](versions/v1.6/INSTALL.md) | Installation and migration |
+| [UNDERSTANDING.md](versions/v1.6/UNDERSTANDING.md) | How it works, system design |
+| [TASKFILE.md](versions/v1.6/TASKFILE.md) | Task runner guide |
+| [PROFILE_MIGRATION.md](versions/v1.6/PROFILE_MIGRATION.md) | Detailed migration reference |
 
-### Development (Planned)
-| File | Purpose |
-|------|---------|
-| `guides/development.md` | Build & development setup |
-| `guides/adding-new-app.md` | Adding WPF applications |
-| `guides/adding-new-launcher.md` | Adding PS launchers |
+**Key Files:**
+- `Taskfile.yml` — Simple build tasks (`task`, `task build:force`, etc.)
+- `build/Build.ps1` — Build script with incremental builds
+- `scripts/Migrate-Profiles.ps1` — v1.5→v1.6 profile migration
+- `src/launchers/_shared/` — Shared launcher module
 
-### Operations (Planned)
-| File | Purpose |
-|------|---------|
-| `process/release-process.md` | Release procedures |
-| `process/versioning-policy.md` | Version numbering |
-| `process/update-mechanism.md` | Update system design |
+### v1.5 (Previous Release)
+**See [versions/v1.5/](versions/v1.5/) for v1.5 documentation**
 
 ---
 
-## Current Directory Structure
+## 📖 Architecture & Design
 
+### v1.6 Implementation
+- **[.agent/v1.6/CONTEXT.md](../.agent/v1.6/CONTEXT.md)** — Quick facts and key files for agents
+- **[.agent/v1.6/BUILD.md](../.agent/v1.6/BUILD.md)** — Incremental build system details
+- **[.agent/v1.6/STRUCTURE.md](../.agent/v1.6/STRUCTURE.md)** — Directory consolidation (src/apps/)
+- **[.agent/v1.6/UPDATES.md](../.agent/v1.6/UPDATES.md)** — Technical changes in v1.6
+
+### Previous Versions
+- **[RESTRUCTURING-STATUS.md](RESTRUCTURING-STATUS.md)** — v1.5 restructuring progress
+- **[architecture/v1.5-restructuring-proposal.md](architecture/v1.5-restructuring-proposal.md)** — v1.5 design rationale
+
+---
+
+## File Organization
+
+### v1.6 User & Developer Docs
 ```
-docs/
-├── README.md                          (this file)
-├── RESTRUCTURING-STATUS.md            (v1.5 progress tracking)
-├── architecture/
-│   ├── v1.5-restructuring-proposal.md (detailed design)
-│   └── MIGRATION-GUIDE-v1.5.md        (step-by-step instructions)
-├── guides/                            (to be created)
-├── process/                           (to be created)
-└── versions/                          (legacy versioned docs)
+docs/versions/v1.6/
+├── INSTALL.md              Installation, migration, profile locations
+├── UPDATES.md              What's new, improvements, benefits
+├── UNDERSTANDING.md        How it works, system design, errors
+├── TASKFILE.md             Task runner guide
+└── PROFILE_MIGRATION.md    Detailed migration reference
 ```
 
----
+### Agent-Focused Docs
+```
+.agent/v1.6/
+├── CONTEXT.md              Quick facts, key files
+├── BUILD.md                Build system and parameters
+├── STRUCTURE.md            Directory structure changes
+└── UPDATES.md              Technical changes summary
+```
 
-## Key Paths
-
-### Project Files
-| Path | Purpose |
-|------|---------|
-| `./VERSION` | Suite version (to be created) |
-| `./CHANGELOG.md` | Release history (to be created) |
-| `./README.md` | Project overview (to be created) |
-| `./.gitmodules.v1.5` | New submodule configuration |
-
-### Source Code (After Migration)
-| Path | Contents |
-|------|----------|
-| `./src/desktop/` | WPF applications |
-| `./src/features/` | App-specific features |
-| `./src/launchers/` | PowerShell launchers |
-| `./src/shared/` | Shared libraries |
-| `./src/tools/` | Build tools & updater |
-
-### Build & Packaging
-| Path | Purpose |
-|------|---------|
-| `./build/` | Build orchestration scripts (to be created) |
-| `./packaging/inno/` | Installer configuration (to be created) |
-| `./dist/` | Build output (to be created) |
+### Root-Level Files
+```
+./
+├── VERSION                 Current version (1.6.0)
+├── CHANGELOG.md            Release history
+├── README.md               Project overview
+├── Taskfile.yml            Build tasks
+├── build/Build.ps1         Build script
+└── scripts/Migrate-Profiles.ps1  Migration tool
+```
 
 ---
 
-## Status of Documentation
+## Common Tasks
 
-### ✅ Complete
-- `.project.md` — Comprehensive project analysis
-- `RESTRUCTURING-STATUS.md` — v1.5 status tracker
-- `architecture/v1.5-restructuring-proposal.md` — Detailed design
-- `architecture/MIGRATION-GUIDE-v1.5.md` — Step-by-step migration
-- `.gitmodules.v1.5` — Reference configuration
+### Building
+**Recommended (with Taskfile):**
+```bash
+task              # Build
+task build:force  # Force rebuild
+task build:app -- MPK.VsCode.ProfilePicker  # Single app
+```
 
-### ⏳ In Progress
-- Nothing currently (planning phase complete)
+**Direct PowerShell:**
+```powershell
+.\build\Build.ps1                          # Build
+.\build\Build.ps1 -ForceRebuild            # Force rebuild
+.\build\Build.ps1 -Only MPK.VsCode.ProfilePicker  # Single app
+```
 
-### ❓ Not Yet Started
-- `guides/` directory and developer documentation
-- `process/` directory and operational documentation
-- Root-level `README.md` and `CHANGELOG.md`
-- CI/CD workflow documentation
+See [v1.6/TASKFILE.md](versions/v1.6/TASKFILE.md) for all tasks.
 
----
+### Migrating from v1.5
+```powershell
+.\scripts\Migrate-Profiles.ps1              # Interactive
+.\scripts\Migrate-Profiles.ps1 -DryRun      # Preview
+.\scripts\Migrate-Profiles.ps1 -Force       # Auto
+```
 
-## How to Use This Documentation
+See [v1.6/PROFILE_MIGRATION.md](versions/v1.6/PROFILE_MIGRATION.md) for details.
 
-### If You're New to the Project
-1. Start with `.project.md` (root level)
-2. Read `RESTRUCTURING-STATUS.md` to see what's happening
-3. Review `architecture/v1.5-restructuring-proposal.md` for the vision
-
-### If You're Implementing v1.5 Migration
-1. Follow `architecture/MIGRATION-GUIDE-v1.5.md` step-by-step
-2. Refer to `.gitmodules.v1.5` for submodule mapping
-3. Use `RESTRUCTURING-STATUS.md` to track progress
-
-### If You're Contributing Code
-*Guides not yet created, but will be in `guides/` soon*
-
-### If You're Cutting a Release
-*Process documentation to be added to `process/` directory*
+### Understanding the System
+Read [v1.6/UNDERSTANDING.md](versions/v1.6/UNDERSTANDING.md) for:
+- How virtual desktop detection works
+- Profile isolation mechanism
+- The complete build→install→launch flow
+- Error messages and solutions
+- How to add new launchers
 
 ---
 
-## Important Notes
+## Key Improvements in v1.6
 
-⚠️ **v1.5 Is a Restructuring Release**
-- No product changes — only organization and build improvements
-- Existing functionality remains unchanged
-- All 14 submodules are reorganized, not rewritten
-
-⚠️ **Migration Requires Planning**
-- Follow the migration guide carefully
-- Test on a clean VM before deploying
-- Backup git tags before starting: `git tag -a backup-pre-v1.5 ...`
-
-ℹ️ **GitHub Repos Won't Be Renamed**
-- Only local directory paths change
-- GitHub repository names stay the same
-- Submodule URLs don't need to change
+✅ **Simplified Build** — Incremental builds, only changed apps rebuild  
+✅ **Shared Launchers** — Eliminated 6 copies of VD detection code  
+✅ **Smaller Installer** — 300 MB → 15 MB (framework-dependent .NET 8)  
+✅ **Unified Profiles** — All profiles in `C:\MPKTools\Profiles\`  
+✅ **Better DX** — Clear error messages, validation, helpful logs  
+✅ **Task Runner** — Simple `task` commands instead of long PowerShell  
+✅ **Solid Docs** — Token-efficient, clear, reference v1.5 for details  
 
 ---
 
-## Quick Reference: Key Concepts
+## Status
 
-### What is a Submodule?
-A git submodule is a repository linked inside another repository. MPK Tools uses 14 submodules:
-- 3 WPF desktop applications
-- 3 feature modules
-- 6 PowerShell launchers
-- 1 shared library
-- 1 updater tool
-
-### Virtual Desktop Profile Isolation
-The core feature: each application gets an isolated profile folder per Windows virtual desktop.
-- Example: Chrome on Desktop 1 gets `C:\ChromeProfiles\virtual_desktop_1\`
-- Example: Chrome on Desktop 2 gets `C:\ChromeProfiles\virtual_desktop_2\`
-- Settings, bookmarks, and extensions remain separate per desktop
-
-### Why v1.5 Structure Matters
-- Current structure: mix of apps, libraries, and experiments in one `apps/` folder
-- v1.5 structure: clear separation — `src/desktop/`, `src/launchers/`, `src/shared/`, etc.
-- Benefit: easier to maintain, scale, and onboard new developers
+| Component | Status |
+|-----------|--------|
+| **v1.6 Core** | ✅ Complete |
+| **Build System** | ✅ Incremental, validated |
+| **Launchers** | ✅ Simplified, robust |
+| **Installer** | ✅ Updated, .NET 8 check |
+| **Migration Tool** | ✅ Tested, backup support |
+| **Documentation** | ✅ Comprehensive |
+| **Task Runner** | ✅ 10 tasks, all working |
+| **DX & Logging** | ✅ Clear errors, good output |
 
 ---
 
 ## See Also
 
-- **Project Root** — `.project.md` contains comprehensive context
-- **Git Submodules** — `git help submodule` for git documentation
-- **GitHub Releases** — https://github.com/vrocky/mpk-tools-vd-win/releases
+- **README.md** — Project overview and installation
+- **GitHub** — https://github.com/vrocky/mpk-tools-vd-win
+- **Releases** — https://github.com/vrocky/mpk-tools-vd-win/releases
+- **Taskfile Docs** — https://taskfile.dev
 
 ---
 
-## Document History
-
-| Date | Author | Change |
-|------|--------|--------|
-| 2026-05-19 | Claude Code | Initial documentation setup for v1.5 planning |
-
----
-
-**Last Updated:** 2026-05-19
+**Last Updated:** 2026-05-21  
+**Version:** 1.6.0

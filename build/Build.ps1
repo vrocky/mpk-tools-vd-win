@@ -52,17 +52,34 @@ if (-not $Version) {
     $Version = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw).Trim() } else { "1.6.0" }
 }
 
-Write-Host "Building MPK Tools v$Version ($Configuration)..." -ForegroundColor Cyan
+Write-Host ""
+Write-Host "╔════════════════════════════════════════════╗" -ForegroundColor Cyan
+Write-Host "║  MPK Tools Build v$Version" -ForegroundColor Cyan
+Write-Host "║  Configuration: $Configuration" -ForegroundColor Cyan
+Write-Host "╚════════════════════════════════════════════╝" -ForegroundColor Cyan
 Write-Host ""
 
 # Validate prerequisites
+Write-Host "📋 Prerequisites:" -ForegroundColor Cyan
 $dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
 if (-not $dotnet) {
-    Write-Error ".NET SDK not found. Install from https://dotnet.microsoft.com/download/dotnet/8.0"
+    Write-Host "  ✗ .NET SDK not found" -ForegroundColor Red
+    Write-Error "Install from: https://dotnet.microsoft.com/download/dotnet/8.0"
     exit 1
 }
 
-Write-Host "Using: $(dotnet --version)" -ForegroundColor DarkGray
+$dotnetVersion = & dotnet --version
+Write-Host "  ✓ .NET SDK: $dotnetVersion" -ForegroundColor Green
+
+if ($Only) {
+    Write-Host "  ✓ Build mode: Single app ($Only)" -ForegroundColor Green
+} elseif ($ForceRebuild) {
+    Write-Host "  ✓ Build mode: Force rebuild (all apps)" -ForegroundColor Green
+} else {
+    Write-Host "  ✓ Build mode: Incremental (changed only)" -ForegroundColor Green
+}
+
+Write-Host ""
 
 function Remove-PathSafe {
     param([Parameter(Mandatory)][string]$Path)
@@ -115,64 +132,93 @@ New-Item -Path $outputRoot  -ItemType Directory -Force | Out-Null
 $publishedCount = 0
 $skippedCount = 0
 
+Write-Host "🏗️  Applications:" -ForegroundColor Cyan
+
 foreach ($app in $allApps) {
     if ($Only -and $app.Id -ne $Only) { continue }
 
     $projPath = Join-Path $repoRoot $app.Project
     if (-not (Test-Path $projPath)) {
-        Write-Warning "Project not found, skipping: $projPath"
+        Write-Host "  ✗ $($app.Id)" -ForegroundColor Yellow
+        Write-Host "    Project not found: $projPath" -ForegroundColor DarkGray
         continue
     }
 
     $outDir = Join-Path $appsRoot $app.Id
     if (-not (Should-Republish -ProjectPath $projPath -OutputPath $outDir -Force $ForceRebuild)) {
-        Write-Host "  [$($app.Id)] Up-to-date, skipping" -ForegroundColor DarkGray
+        Write-Host "  ⊘ $($app.Id)" -ForegroundColor DarkGray
+        Write-Host "    (unchanged)" -ForegroundColor DarkGray
         $skippedCount++
         continue
     }
 
-    Write-Host "  Publishing $($app.Id)..." -ForegroundColor Cyan
+    Write-Host "  ⚙️  $($app.Id)..." -ForegroundColor Cyan
     dotnet publish $projPath -c $Configuration `
         -p:PublishReadyToRun=false `
-        -o $outDir
-    if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $projPath" }
+        -o $outDir 2>&1 | Where-Object { $_ -match "error|warning" } | ForEach-Object { Write-Host "     $_" -ForegroundColor Yellow }
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "  ✗ $($app.Id) - BUILD FAILED" -ForegroundColor Red
+        throw "dotnet publish failed for $projPath"
+    }
+    Write-Host "  ✓ $($app.Id)" -ForegroundColor Green
     $publishedCount++
 }
 
-if (-not (Test-Path $updaterProj)) { throw "Updater project not found: $updaterProj" }
+if (-not (Test-Path $updaterProj)) {
+    Write-Host "  ✗ Updater project not found" -ForegroundColor Red
+    throw "File not found: $updaterProj"
+}
+
 if (Should-Republish -ProjectPath $updaterProj -OutputPath $updaterRoot -Force $ForceRebuild) {
-    Write-Host "  Publishing MPKToolsUpdater..." -ForegroundColor Cyan
-    dotnet publish $updaterProj -c $Configuration -o $updaterRoot
-    if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $updaterProj" }
+    Write-Host "  ⚙️  MPKToolsUpdater..." -ForegroundColor Cyan
+    dotnet publish $updaterProj -c $Configuration -o $updaterRoot 2>&1 | Where-Object { $_ -match "error|warning" } | ForEach-Object { Write-Host "     $_" -ForegroundColor Yellow }
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "  ✗ MPKToolsUpdater - BUILD FAILED" -ForegroundColor Red
+        throw "dotnet publish failed for $updaterProj"
+    }
+    Write-Host "  ✓ MPKToolsUpdater" -ForegroundColor Green
     $publishedCount++
 } else {
-    Write-Host "  [MPKToolsUpdater] Up-to-date, skipping" -ForegroundColor DarkGray
+    Write-Host "  ⊘ MPKToolsUpdater" -ForegroundColor DarkGray
+    Write-Host "    (unchanged)" -ForegroundColor DarkGray
     $skippedCount++
-}
-
-if ($publishedCount -gt 0) {
-    Write-Host "  Published: $publishedCount apps" -ForegroundColor Green
-}
-if ($skippedCount -gt 0) {
-    Write-Host "  Skipped: $skippedCount apps (up-to-date)" -ForegroundColor DarkGray
 }
 
 $updaterFiles = Get-ChildItem -Path $updaterRoot -File -ErrorAction SilentlyContinue
 if (-not $updaterFiles) {
-    throw "Updater build failed: no output in $updaterRoot (expected MPKToolsUpdater.exe)"
+    Write-Host "  ✗ Updater build failed" -ForegroundColor Red
+    throw "No output in $updaterRoot (expected MPKToolsUpdater.exe)"
 }
 
+Write-Host ""
+Write-Host "📋 Build Summary:" -ForegroundColor Cyan
+Write-Host "  ✓ Published: $publishedCount" -ForegroundColor Green
+Write-Host "  ⊘ Skipped:   $skippedCount (up-to-date)" -ForegroundColor DarkGray
+Write-Host ""
+
+Write-Host "📦 Launchers:" -ForegroundColor Cyan
 foreach ($launcher in $launcherDirs) {
     $srcPath = Join-Path $repoRoot $launcher.Path
-    if (-not (Test-Path $srcPath)) { Write-Warning "Launcher not found, skipping: $srcPath"; continue }
+    if (-not (Test-Path $srcPath)) {
+        Write-Host "  ⚠️  $($launcher.Id) - source not found" -ForegroundColor Yellow
+        continue
+    }
     $dstPath = Join-Path $scriptsRoot $launcher.Id
     New-Item -Path $dstPath -ItemType Directory -Force | Out-Null
     Get-ChildItem -Path $srcPath -File |
         Where-Object { $_.Name -like "Launch-*.ps1" -or $_.Name -eq "Create-Shortcut.ps1" -or $_.Extension -eq ".ico" } |
         ForEach-Object { Copy-Item $_.FullName -Destination $dstPath -Force }
+    Write-Host "  ✓ $($launcher.Id)" -ForegroundColor Green
 }
 
-if (-not (Test-Path $issFile)) { throw "Inno Setup script not found: $issFile" }
+if (-not (Test-Path $issFile)) {
+    Write-Host "  ✗ Inno Setup script not found" -ForegroundColor Red
+    throw "File not found: $issFile"
+}
+
+Write-Host ""
+Write-Host "📦 Installer:" -ForegroundColor Cyan
 
 if (-not $SkipCompileInstaller) {
     $iscc = Get-Command "iscc" -ErrorAction SilentlyContinue
@@ -182,16 +228,36 @@ if (-not $SkipCompileInstaller) {
     }
 
     if (-not $isccPath) {
-        Write-Warning "iscc not found. Staging ready at: $stageRoot"
-        Write-Warning "Compile manually: $issFile"
+        Write-Host "  ⚠️  Inno Setup not found" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "  Staging ready at: $stageRoot" -ForegroundColor Green
+        Write-Host "  To compile: Download Inno Setup 6, then run:" -ForegroundColor Cyan
+        Write-Host "    iscc /DAppVersion=$Version /O$outputRoot $issFile" -ForegroundColor DarkGray
+        Write-Host ""
+        Write-Host "  Or install via: scoop install inno-setup" -ForegroundColor DarkGray
         return
     }
 
-    Write-Host "  Compiling installer..." -ForegroundColor Cyan
-    & $isccPath "/DAppVersion=$Version" "/O$outputRoot" $issFile
-    if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed." }
+    Write-Host "  ⚙️  Compiling installer..." -ForegroundColor Cyan
+    & $isccPath "/DAppVersion=$Version" "/O$outputRoot" $issFile | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
 
-    Write-Host "Installer: $outputRoot\MPK-Tools-Setup-$Version.exe" -ForegroundColor Green
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "  ✗ Installer compilation failed" -ForegroundColor Red
+        throw "Inno Setup returned exit code $LASTEXITCODE"
+    }
+
+    $installerPath = "$outputRoot\MPK-Tools-Setup-$Version.exe"
+    if (Test-Path $installerPath) {
+        $installerSize = (Get-Item $installerPath).Length / 1MB
+        Write-Host "  ✓ Installer created" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "✨ Build Complete!" -ForegroundColor Cyan
+        Write-Host "   Output: $installerPath" -ForegroundColor Green
+        Write-Host "   Size:   $('{0:F1}' -f $installerSize) MB" -ForegroundColor Green
+    }
 } else {
-    Write-Host "Staging complete: $stageRoot" -ForegroundColor Green
+    Write-Host "  ⊘ Installer compilation skipped (-SkipCompileInstaller)" -ForegroundColor DarkGray
+    Write-Host ""
+    Write-Host "✅ Staging Complete!" -ForegroundColor Cyan
+    Write-Host "   Ready at: $stageRoot" -ForegroundColor Green
 }
